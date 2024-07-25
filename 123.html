@@ -1,78 +1,62 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="utf-8">
+  <title>高德地图定位示例</title>
+  <script src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
+  <style>
+    #container {
+      width: 100%;
+      height: 100vh;
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;高德地图定位示例&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://webapi.amap.com/maps?v=1.4.15&amp;key=36ad54204561f8044ed21fb739f5abe4"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#container {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="container"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>var map = new AMap.Map('container', {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>resizeEnable: true,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>center: [116.397428, 39.90923],</p>
-<p class="p1"><span class="Apple-converted-space">      </span>zoom: 13</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// 使用浏览器定位</p>
-<p class="p1"><span class="Apple-converted-space">    </span>map.plugin('AMap.Geolocation', function() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var geolocation = new AMap.Geolocation({</p>
-<p class="p1"><span class="Apple-converted-space">        </span>enableHighAccuracy: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>timeout: 10000,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>maximumAge: 0,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>convert: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>showButton: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>buttonPosition: 'RB',</p>
-<p class="p1"><span class="Apple-converted-space">        </span>buttonOffset: new AMap.Pixel(10, 20),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>showMarker: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>showCircle: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>panToLocation: true,</p>
-<p class="p1"><span class="Apple-converted-space">        </span>zoomToAccuracy: true</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>map.addControl(geolocation);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>geolocation.getCurrentPosition();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>AMap.event.addListener(geolocation, 'complete', onComplete); // 返回定位信息</p>
-<p class="p1"><span class="Apple-converted-space">      </span>AMap.event.addListener(geolocation, 'error', onError); // 返回定位出错信息</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// 定位成功信息处理</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function onComplete(data) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>window.parent.postMessage({</p>
-<p class="p1"><span class="Apple-converted-space">        </span>type: 'location',</p>
-<p class="p1"><span class="Apple-converted-space">        </span>longitude: data.position.getLng(),</p>
-<p class="p1"><span class="Apple-converted-space">        </span>latitude: data.position.getLat()</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}, '*');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// 定位失败信息处理</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function onError(error) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>window.parent.postMessage({</p>
-<p class="p1"><span class="Apple-converted-space">        </span>type: 'error',</p>
-<p class="p1"><span class="Apple-converted-space">        </span>message: '定位失败'</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}, '*');</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+  <div id="container"></div>
+  <script>
+    var map = new AMap.Map('container', {
+      resizeEnable: true,
+      center: [116.397428, 39.90923],
+      zoom: 13
+    });
+
+    // 使用浏览器定位
+    map.plugin('AMap.Geolocation', function() {
+      var geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+        convert: true,
+        showButton: true,
+        buttonPosition: 'RB',
+        buttonOffset: new AMap.Pixel(10, 20),
+        showMarker: true,
+        showCircle: true,
+        panToLocation: true,
+        zoomToAccuracy: true
+      });
+      map.addControl(geolocation);
+      geolocation.getCurrentPosition();
+      AMap.event.addListener(geolocation, 'complete', onComplete); // 返回定位信息
+      AMap.event.addListener(geolocation, 'error', onError); // 返回定位出错信息
+    });
+
+    // 定位成功信息处理
+    function onComplete(data) {
+      window.parent.postMessage({
+        type: 'location',
+        longitude: data.position.getLng(),
+        latitude: data.position.getLat()
+      }, '*');
+    }
+
+    // 定位失败信息处理
+    function onError(error) {
+      window.parent.postMessage({
+        type: 'error',
+        message: '定位失败'
+      }, '*');
+    }
+  </script>
 </body>
 </html>
