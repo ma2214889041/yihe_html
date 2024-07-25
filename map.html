@@ -7,12 +7,25 @@
   <style>
     #container {
       width: 100%;
-      height: 100vh;
+      height: 90vh;
+    }
+    #confirmButton {
+      width: 100%;
+      height: 10vh;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    #confirmButton:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
 <body>
   <div id="container"></div>
+  <button id="confirmButton" disabled>确认</button>
   <script>
     var map = new AMap.Map('container', {
       resizeEnable: true,
@@ -49,20 +62,41 @@
         longitude: data.position.getLng(),
         latitude: data.position.getLat()
       };
-      window.parent.postMessage({
-        type: 'location',
-        longitude: currentLocation.longitude,
-        latitude: currentLocation.latitude
-      }, '*');
+      document.getElementById('confirmButton').disabled = false;
     }
 
     // 定位失败信息处理
     function onError(error) {
-      window.parent.postMessage({
-        type: 'error',
-        message: '定位失败'
-      }, '*');
+      alert('定位失败，请重试');
     }
+
+    // 点击确认按钮发送位置信息
+    document.getElementById('confirmButton').addEventListener('click', function() {
+      if (currentLocation) {
+        this.textContent = '确认中...';
+        this.disabled = true;
+
+        fetch('https://play.svix.com/in/e_fV75v65uaQ4MxeOtPf2k1EQ9y9d/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(currentLocation)
+        })
+        .then(response => {
+          if (response.status === 204) {
+            this.textContent = '确认成功';
+          } else {
+            throw new Error('网络响应不正常');
+          }
+        })
+        .catch((error) => {
+          console.error('网络请求失败:', error);
+          this.textContent = '确认失败，请重试';
+          this.disabled = false;
+        });
+      }
+    });
   </script>
 </body>
 </html>
