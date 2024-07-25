@@ -9,27 +9,10 @@
       width: 100%;
       height: 100vh;
     }
-    #confirmButton {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      z-index: 1000;
-      transition: transform 0.2s ease;
-    }
-    #confirmButton:active {
-      transform: scale(0.95);
-    }
   </style>
 </head>
 <body>
   <div id="container"></div>
-  <button id="confirmButton" disabled>确认地址</button>
   <script>
     var map = new AMap.Map('container', {
       resizeEnable: true,
@@ -66,7 +49,11 @@
         longitude: data.position.getLng(),
         latitude: data.position.getLat()
       };
-      document.getElementById('confirmButton').disabled = false;
+      window.parent.postMessage({
+        type: 'location',
+        longitude: currentLocation.longitude,
+        latitude: currentLocation.latitude
+      }, '*');
     }
 
     // 定位失败信息处理
@@ -76,17 +63,6 @@
         message: '定位失败'
       }, '*');
     }
-
-    // 点击确认按钮发送位置信息
-    document.getElementById('confirmButton').addEventListener('click', function() {
-      if (currentLocation) {
-        window.parent.postMessage({
-          type: 'location',
-          longitude: currentLocation.longitude,
-          latitude: currentLocation.latitude
-        }, '*');
-      }
-    });
   </script>
 </body>
 </html>
