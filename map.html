@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>高德地图定位示例</title>
+  <script src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
+  <style>
+    #container {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <script>
+    var map = new AMap.Map('container', {
+      resizeEnable: true,
+      center: [116.397428, 39.90923],
+      zoom: 13
+    });
+
+    // 使用浏览器定位
+    map.plugin('AMap.Geolocation', function() {
+      var geolocation = new AMap.Geolocation({
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+        convert: true,
+        showButton: true,
+        buttonPosition: 'RB',
+        buttonOffset: new AMap.Pixel(10, 20),
+        showMarker: true,
+        showCircle: true,
+        panToLocation: true,
+        zoomToAccuracy: true
+      });
+      map.addControl(geolocation);
+      geolocation.getCurrentPosition();
+      AMap.event.addListener(geolocation, 'complete', onComplete); // 返回定位信息
+      AMap.event.addListener(geolocation, 'error', onError); // 返回定位出错信息
+    });
+
+    // 定位成功信息处理
+    function onComplete(data) {
+      window.parent.postMessage({
+        type: 'location',
+        longitude: data.position.getLng(),
+        latitude: data.position.getLat()
+      }, '*');
+    }
+
+    // 定位失败信息处理
+    function onError(error) {
+      window.parent.postMessage({
+        type: 'error',
+        message: '定位失败'
+      }, '*');
+    }
+  </script>
+</body>
+</html>
