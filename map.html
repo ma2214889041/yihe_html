@@ -9,16 +9,35 @@
       width: 100%;
       height: 100vh;
     }
+    #confirmButton {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+      transition: transform 0.2s ease;
+    }
+    #confirmButton:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
 <body>
   <div id="container"></div>
+  <button id="confirmButton" disabled>确认地址</button>
   <script>
     var map = new AMap.Map('container', {
       resizeEnable: true,
       center: [116.397428, 39.90923],
       zoom: 13
     });
+
+    var currentLocation = null;
 
     // 使用浏览器定位
     map.plugin('AMap.Geolocation', function() {
@@ -43,11 +62,11 @@
 
     // 定位成功信息处理
     function onComplete(data) {
-      window.parent.postMessage({
-        type: 'location',
+      currentLocation = {
         longitude: data.position.getLng(),
         latitude: data.position.getLat()
-      }, '*');
+      };
+      document.getElementById('confirmButton').disabled = false;
     }
 
     // 定位失败信息处理
@@ -57,6 +76,17 @@
         message: '定位失败'
       }, '*');
     }
+
+    // 点击确认按钮发送位置信息
+    document.getElementById('confirmButton').addEventListener('click', function() {
+      if (currentLocation) {
+        window.parent.postMessage({
+          type: 'location',
+          longitude: currentLocation.longitude,
+          latitude: currentLocation.latitude
+        }, '*');
+      }
+    });
   </script>
 </body>
 </html>
