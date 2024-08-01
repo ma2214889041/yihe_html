@@ -85,7 +85,6 @@
             console.log('定位失败', data);
         }
 
-        // 添加点击事件监听器
         map.on('click', function(e) {
             console.log('地图点击', e);
             updateLocation(e.lnglat.getLng(), e.lnglat.getLat());
@@ -101,11 +100,13 @@
         }
 
         document.getElementById('confirmButton').addEventListener('click', function() {
-            if (currentLocation && window.tt && window.tt.postMessage) {
-                window.tt.postMessage({
-                    action: 'confirmLocation',
-                    data: currentLocation
-                });
+            console.log('确认按钮被点击');
+            if (currentLocation) {
+                console.log('正在通过 URL 发送位置信息到小程序:', currentLocation);
+                var url = 'ttscheme://miniapp/location?latitude=' + currentLocation.latitude + '&longitude=' + currentLocation.longitude;
+                window.location.href = url;
+            } else {
+                console.error('无法发送位置信息: currentLocation 不存在');
             }
         });
     </script>
