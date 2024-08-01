@@ -101,18 +101,17 @@
 
         document.getElementById('confirmButton').addEventListener('click', function() {
             console.log('确认按钮被点击');
-            if (currentLocation && tt && tt.postMessage) {
-                console.log('正在发送位置信息到小程序:', currentLocation);
-                tt.postMessage({
-                    action: 'confirmLocation',
-                    data: currentLocation
-                });
+            if (currentLocation) {
+                console.log('正在保存位置信息:', currentLocation);
+                localStorage.setItem('mapLocation', JSON.stringify(currentLocation));
+                alert('位置已确认，请返回小程序查看结果');
+                // 尝试通知小程序（可能在某些环境下不起作用）
+                if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
+                    tt.miniProgram.postMessage({ data: { action: 'locationSaved' } });
+                }
             } else {
-                console.error('无法发送位置信息:', {
-                    currentLocation: currentLocation,
-                    ttExists: !!tt,
-                    postMessageExists: !!(tt && tt.postMessage)
-                });
+                console.error('无法保存位置信息: currentLocation 不存在');
+                alert('无法获取位置信息，请重试');
             }
         });
     </script>
