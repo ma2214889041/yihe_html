@@ -5,18 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>位置确认</title>
     <style>
-        #message {
-            margin-top: 20px;
-            padding: 10px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
             background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        #coordinates, #message {
+            background-color: white;
+            padding: 15px;
             border-radius: 5px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #message {
+            display: none;
+            color: #4CAF50;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <h1>位置已确认</h1>
-    <p id="coordinates"></p>
-    <div id="message" style="display: none;"></div>
+    <div id="coordinates"></div>
+    <div id="message"></div>
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var lat = urlParams.get('lat');
