@@ -56,18 +56,11 @@
 
         document.getElementById('confirmButton').addEventListener('click', function() {
             if (currentLocation) {
-                // 尝试使用 URL scheme 来传递数据
-                var url = 'larkscheme://miniapp/location?latitude=' + currentLocation.getLat() + '&longitude=' + currentLocation.getLng();
-                window.location.href = url;
-            }
-        });
-
-        // 页面加载完成后通知小程序
-        window.addEventListener('load', function() {
-            if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
-                tt.miniProgram.postMessage({
-                    data: { action: 'pageLoaded' }
-                });
+                localStorage.setItem('mapLocation', JSON.stringify({
+                    latitude: currentLocation.getLat(),
+                    longitude: currentLocation.getLng()
+                }));
+                alert('位置已确认，请返回小程序查看结果');
             }
         });
     </script>
