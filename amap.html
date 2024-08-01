@@ -1,45 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高德地图</title>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
-    <style>
-        html, body, #container {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        #info {
-            position: fixed;
-            bottom: 60px;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-        }
-        #confirmButton {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #1aad19;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-    </style>
+    <!-- 保持头部内容不变 -->
 </head>
 <body>
     <div id="container"></div>
     <div id="info"></div>
     <button id="confirmButton" style="display:none;">确认位置</button>
     <script>
+        console.log('地图页面开始加载');
         var map = new AMap.Map('container', {
             resizeEnable: true,
             zoom: 11
@@ -47,6 +16,7 @@
         var currentLocation = null;
 
         AMap.plugin('AMap.Geolocation', function() {
+            console.log('正在获取当前位置');
             var geolocation = new AMap.Geolocation({
                 enableHighAccuracy: true,
                 timeout: 10000,
@@ -56,22 +26,26 @@
             });
 
             map.addControl(geolocation);
-            geolocation.getCurrentPosition();
+            geolocation.getCurrentPosition(function(status, result) {
+                if (status == 'complete') {
+                    console.log('获取当前位置成功:', result.position);
+                } else {
+                    console.log('获取当前位置失败');
+                }
+            });
         });
 
         map.on('click', function(e) {
+            console.log('地图被点击，坐标:', e.lnglat.toString());
             currentLocation = e.lnglat;
             document.getElementById('info').innerHTML = '选中的位置：' + currentLocation.getLng().toFixed(6) + ',' + currentLocation.getLat().toFixed(6);
             document.getElementById('confirmButton').style.display = 'block';
         });
 
         document.getElementById('confirmButton').addEventListener('click', function() {
+            console.log('确认按钮被点击');
             if (currentLocation) {
-                localStorage.setItem('mapLocation', JSON.stringify({
-                    latitude: currentLocation.getLat(),
-                    longitude: currentLocation.getLng()
-                }));
-                alert('位置已确认，请关闭此页面返回小程序');
+                console.log('正在发送位置信息到小程序');
                 if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
                     tt.miniProgram.postMessage({
                         data: {
@@ -80,6 +54,9 @@
                             longitude: currentLocation.getLng()
                         }
                     });
+                    console.log('位置信息已发送到小程序');
+                } else {
+                    console.error('无法发送消息到小程序，tt.miniProgram.postMessage 不可用');
                 }
             }
         });
