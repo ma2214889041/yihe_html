@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>高德地图</title>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=YOUR_AMAP_KEY"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
     <style>
         html, body, #container {
             height: 100%;
@@ -54,6 +54,17 @@
         function onError(data) {
             console.log('定位失败', data);
         }
+
+        // 添加点击事件监听器
+        map.on('click', function(e) {
+            console.log('地图点击', e);
+            if (window.tt && window.tt.postMessage) {
+                window.tt.postMessage({
+                    latitude: e.lnglat.getLat(),
+                    longitude: e.lnglat.getLng()
+                });
+            }
+        });
     </script>
 </body>
 </html>
