@@ -5,27 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>位置确认</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-        #coordinates, #message {
-            background-color: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #message {
-            display: none;
-            color: #4CAF50;
-            font-weight: bold;
-        }
+        /* 保持原有样式不变 */
     </style>
 </head>
 <body>
@@ -33,19 +13,28 @@
     <div id="coordinates"></div>
     <div id="message"></div>
     <script>
+        console.log('result.html 已加载');
         var urlParams = new URLSearchParams(window.location.search);
         var lat = urlParams.get('lat');
         var lng = urlParams.get('lng');
         document.getElementById('coordinates').innerHTML = '纬度: ' + lat + '<br>经度: ' + lng;
+        console.log('坐标已显示:', lat, lng);
 
-        // 监听来自小程序的消息
-        tt.onMessage(function(res) {
-            console.log('收到小程序消息:', res);
-            if (res.data && res.data.action === 'locationReceived') {
-                document.getElementById('message').style.display = 'block';
-                document.getElementById('message').innerHTML = res.data.message;
-            }
-        });
+        // 检查 tt 对象是否存在
+        if (typeof tt !== 'undefined') {
+            console.log('tt 对象存在');
+            // 监听来自小程序的消息
+            tt.onMessage(function(res) {
+                console.log('收到小程序消息:', res);
+                if (res.data && res.data.action === 'locationReceived') {
+                    document.getElementById('message').style.display = 'block';
+                    document.getElementById('message').innerHTML = res.data.message;
+                    console.log('已显示小程序确认消息');
+                }
+            });
+        } else {
+            console.error('tt 对象不存在');
+        }
     </script>
 </body>
 </html>
