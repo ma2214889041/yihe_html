@@ -5,37 +5,52 @@
   <title>高德地图定位示例</title>
   <script src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
   <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
     #container {
       width: 100%;
-      height: 90vh;
+      height: 100vh;
+      position: relative;
     }
     #confirmButton {
-      width: 100%;
-      height: 10vh;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
+      border-radius: 20px;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+    #confirmButton:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
     }
     #confirmButton:active {
-      transform: scale(0.95);
+      transform: translateX(-50%) scale(0.95);
     }
   </style>
 </head>
 <body>
   <div id="container"></div>
-  <button id="confirmButton" disabled>确认</button>
+  <button id="confirmButton" disabled>确认位置</button>
   <script>
     var map = new AMap.Map('container', {
       resizeEnable: true,
-      center: [116.397428, 39.90923],
-      zoom: 13
+      zoom: 15
     });
-
     var currentLocation = null;
+    var locationMarker = null;
 
-    // 使用浏览器定位
     map.plugin('AMap.Geolocation', function() {
       var geolocation = new AMap.Geolocation({
         enableHighAccuracy: true,
@@ -45,37 +60,42 @@
         showButton: true,
         buttonPosition: 'RB',
         buttonOffset: new AMap.Pixel(10, 20),
-        showMarker: true,
+        showMarker: false,
         showCircle: true,
         panToLocation: true,
         zoomToAccuracy: true
       });
       map.addControl(geolocation);
       geolocation.getCurrentPosition();
-      AMap.event.addListener(geolocation, 'complete', onComplete); // 返回定位信息
-      AMap.event.addListener(geolocation, 'error', onError); // 返回定位出错信息
+      AMap.event.addListener(geolocation, 'complete', onComplete);
+      AMap.event.addListener(geolocation, 'error', onError);
     });
 
-    // 定位成功信息处理
     function onComplete(data) {
       currentLocation = {
         longitude: data.position.getLng(),
         latitude: data.position.getLat()
       };
+      if (locationMarker) {
+        locationMarker.setPosition([currentLocation.longitude, currentLocation.latitude]);
+      } else {
+        locationMarker = new AMap.Marker({
+          position: [currentLocation.longitude, currentLocation.latitude],
+          map: map
+        });
+      }
+      map.setCenter([currentLocation.longitude, currentLocation.latitude]);
       document.getElementById('confirmButton').disabled = false;
     }
 
-    // 定位失败信息处理
     function onError(error) {
       alert('定位失败，请重试');
     }
 
-    // 点击确认按钮发送位置信息
     document.getElementById('confirmButton').addEventListener('click', function() {
       if (currentLocation) {
         this.textContent = '确认中...';
         this.disabled = true;
-
         fetch('https://play.svix.com/in/e_fV75v65uaQ4MxeOtPf2k1EQ9y9d/', {
           method: 'POST',
           headers: {
@@ -86,6 +106,9 @@
         .then(response => {
           if (response.status === 204) {
             this.textContent = '确认成功';
+            // 跳转到GPS定位点
+            map.setCenter([currentLocation.longitude, currentLocation.latitude]);
+            map.setZoom(18);  // 设置更高的缩放级别以更好地显示位置
           } else {
             throw new Error('网络响应不正常');
           }
