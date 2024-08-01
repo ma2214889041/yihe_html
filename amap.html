@@ -1,117 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高德地图</title>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
+    <!-- 保持其他部分不变 -->
     <style>
-        html, body, #container {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        #overlay {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #coordinates {
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        #confirmButton {
+        /* 保持其他样式不变 */
+        #returnButton {
+            margin-top: 10px;
             width: 80%;
             height: 40px;
             line-height: 40px;
-            background-color: #07C160;
+            background-color: #1E90FF;
             color: white;
             font-size: 16px;
             border-radius: 20px;
             border: none;
             cursor: pointer;
         }
-        #confirmButton:disabled {
-            background-color: #9ED99D;
-            color: rgba(255, 255, 255, 0.6);
-        }
     </style>
 </head>
 <body>
-    <div id="container"></div>
+    <!-- 保持其他部分不变 -->
     <div id="overlay">
         <div id="coordinates"></div>
         <button id="confirmButton" disabled>确认位置</button>
+        <button id="returnButton" style="display: none;">返回小程序</button>
     </div>
     <script>
-        var map = new AMap.Map('container', {
-            resizeEnable: true,
-            zoom: 11
-        });
-        var currentLocation = null;
-
-        AMap.plugin('AMap.Geolocation', function() {
-            var geolocation = new AMap.Geolocation({
-                enableHighAccuracy: true,
-                timeout: 10000,
-                buttonPosition: 'RB',
-                buttonOffset: new AMap.Pixel(10, 20),
-                zoomToAccuracy: true
-            });
-
-            map.addControl(geolocation);
-            geolocation.getCurrentPosition(function(status, result) {
-                if (status == 'complete') {
-                    onComplete(result);
-                } else {
-                    onError(result);
-                }
-            });
-        });
-
-        function onComplete(data) {
-            console.log('定位成功', data);
-            updateLocation(data.position.getLng(), data.position.getLat());
-        }
-
-        function onError(data) {
-            console.log('定位失败', data);
-        }
-
-        map.on('click', function(e) {
-            console.log('地图点击', e);
-            updateLocation(e.lnglat.getLng(), e.lnglat.getLat());
-        });
-
-        function updateLocation(longitude, latitude) {
-            currentLocation = { longitude, latitude };
-            document.getElementById('coordinates').innerHTML = `
-                <p>经度: ${longitude.toFixed(6)}</p>
-                <p>纬度: ${latitude.toFixed(6)}</p>
-            `;
-            document.getElementById('confirmButton').disabled = false;
-        }
+        // 保持其他代码不变
 
         document.getElementById('confirmButton').addEventListener('click', function() {
             console.log('确认按钮被点击');
             if (currentLocation) {
                 console.log('正在保存位置信息:', currentLocation);
                 localStorage.setItem('mapLocation', JSON.stringify(currentLocation));
-                alert('位置已确认，请返回小程序查看结果');
-                // 尝试通知小程序（可能在某些环境下不起作用）
-                if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
-                    tt.miniProgram.postMessage({ data: { action: 'locationSaved' } });
-                }
+                alert('位置已确认，请点击"返回小程序"按钮');
+                document.getElementById('returnButton').style.display = 'block';
             } else {
                 console.error('无法保存位置信息: currentLocation 不存在');
                 alert('无法获取位置信息，请重试');
+            }
+        });
+
+        document.getElementById('returnButton').addEventListener('click', function() {
+            if (tt && tt.miniProgram && tt.miniProgram.navigateBack) {
+                tt.miniProgram.navigateBack();
+            } else {
+                alert('无法自动返回小程序，请手动返回');
             }
         });
     </script>
