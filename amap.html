@@ -1,51 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- 保持其他部分不变 -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高德地图</title>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
     <style>
-        /* 保持其他样式不变 */
-        #returnButton {
-            margin-top: 10px;
-            width: 80%;
-            height: 40px;
-            line-height: 40px;
-            background-color: #1E90FF;
-            color: white;
-            font-size: 16px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #info {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- 保持其他部分不变 -->
-    <div id="overlay">
-        <div id="coordinates"></div>
-        <button id="confirmButton" disabled>确认位置</button>
-        <button id="returnButton" style="display: none;">返回小程序</button>
-    </div>
+    <div id="container"></div>
+    <div id="info"></div>
     <script>
-        // 保持其他代码不变
-
-        document.getElementById('confirmButton').addEventListener('click', function() {
-            console.log('确认按钮被点击');
-            if (currentLocation) {
-                console.log('正在保存位置信息:', currentLocation);
-                localStorage.setItem('mapLocation', JSON.stringify(currentLocation));
-                alert('位置已确认，请点击"返回小程序"按钮');
-                document.getElementById('returnButton').style.display = 'block';
-            } else {
-                console.error('无法保存位置信息: currentLocation 不存在');
-                alert('无法获取位置信息，请重试');
-            }
+        var map = new AMap.Map('container', {
+            resizeEnable: true,
+            zoom: 11
         });
 
-        document.getElementById('returnButton').addEventListener('click', function() {
-            if (tt && tt.miniProgram && tt.miniProgram.navigateBack) {
-                tt.miniProgram.navigateBack();
-            } else {
-                alert('无法自动返回小程序，请手动返回');
+        AMap.plugin('AMap.Geolocation', function() {
+            var geolocation = new AMap.Geolocation({
+                enableHighAccuracy: true,
+                timeout: 10000,
+                buttonPosition: 'RB',
+                buttonOffset: new AMap.Pixel(10, 20),
+                zoomToAccuracy: true
+            });
+
+            map.addControl(geolocation);
+            geolocation.getCurrentPosition();
+        });
+
+        map.on('click', function(e) {
+            var lnglat = e.lnglat;
+            document.getElementById('info').innerHTML = '选中的位置：' + lnglat.getLng() + ',' + lnglat.getLat();
+            
+            // 发送消息到小程序
+            if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
+                tt.miniProgram.postMessage({
+                    data: {
+                        action: 'locationSelected',
+                        longitude: lnglat.getLng(),
+                        latitude: lnglat.getLat()
+                    }
+                });
             }
         });
     </script>
