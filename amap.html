@@ -12,9 +12,18 @@
             margin: 0;
             padding: 0;
         }
+        #info {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
         #confirmButton {
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
@@ -28,6 +37,7 @@
 </head>
 <body>
     <div id="container"></div>
+    <div id="info"></div>
     <button id="confirmButton" style="display:none;">确认位置</button>
     <script>
         var map = new AMap.Map('container', {
@@ -51,6 +61,7 @@
 
         map.on('click', function(e) {
             currentLocation = e.lnglat;
+            document.getElementById('info').innerHTML = '选中的位置：' + currentLocation.getLng().toFixed(6) + ',' + currentLocation.getLat().toFixed(6);
             document.getElementById('confirmButton').style.display = 'block';
         });
 
@@ -60,7 +71,16 @@
                     latitude: currentLocation.getLat(),
                     longitude: currentLocation.getLng()
                 }));
-                alert('位置已确认，请返回小程序查看结果');
+                alert('位置已确认，请关闭此页面返回小程序');
+                if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
+                    tt.miniProgram.postMessage({
+                        data: {
+                            action: 'locationConfirmed',
+                            latitude: currentLocation.getLat(),
+                            longitude: currentLocation.getLng()
+                        }
+                    });
+                }
             }
         });
     </script>
