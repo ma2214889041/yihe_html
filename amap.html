@@ -12,18 +12,9 @@
             margin: 0;
             padding: 0;
         }
-        #info {
-            position: fixed;
-            bottom: 60px;
-            left: 0;
-            right: 0;
-            padding: 10px;
-            background-color: rgba(255, 255, 255, 0.8);
-            text-align: center;
-        }
         #confirmButton {
             position: fixed;
-            bottom: 10px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px 20px;
@@ -37,7 +28,6 @@
 </head>
 <body>
     <div id="container"></div>
-    <div id="info"></div>
     <button id="confirmButton" style="display:none;">确认位置</button>
     <script>
         var map = new AMap.Map('container', {
@@ -61,18 +51,22 @@
 
         map.on('click', function(e) {
             currentLocation = e.lnglat;
-            document.getElementById('info').innerHTML = '选中的位置：' + currentLocation.getLng() + ',' + currentLocation.getLat();
             document.getElementById('confirmButton').style.display = 'block';
         });
 
         document.getElementById('confirmButton').addEventListener('click', function() {
-            if (currentLocation && tt && tt.miniProgram && tt.miniProgram.postMessage) {
+            if (currentLocation) {
+                // 尝试使用 URL scheme 来传递数据
+                var url = 'larkscheme://miniapp/location?latitude=' + currentLocation.getLat() + '&longitude=' + currentLocation.getLng();
+                window.location.href = url;
+            }
+        });
+
+        // 页面加载完成后通知小程序
+        window.addEventListener('load', function() {
+            if (tt && tt.miniProgram && tt.miniProgram.postMessage) {
                 tt.miniProgram.postMessage({
-                    data: {
-                        action: 'locationConfirmed',
-                        longitude: currentLocation.getLng(),
-                        latitude: currentLocation.getLat()
-                    }
+                    data: { action: 'pageLoaded' }
                 });
             }
         });
