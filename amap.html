@@ -101,12 +101,18 @@
 
         document.getElementById('confirmButton').addEventListener('click', function() {
             console.log('确认按钮被点击');
-            if (currentLocation) {
-                console.log('正在通过 URL 发送位置信息到小程序:', currentLocation);
-                var url = 'ttscheme://miniapp/location?latitude=' + currentLocation.latitude + '&longitude=' + currentLocation.longitude;
-                window.location.href = url;
+            if (currentLocation && tt && tt.postMessage) {
+                console.log('正在发送位置信息到小程序:', currentLocation);
+                tt.postMessage({
+                    action: 'confirmLocation',
+                    data: currentLocation
+                });
             } else {
-                console.error('无法发送位置信息: currentLocation 不存在');
+                console.error('无法发送位置信息:', {
+                    currentLocation: currentLocation,
+                    ttExists: !!tt,
+                    postMessageExists: !!(tt && tt.postMessage)
+                });
             }
         });
     </script>
