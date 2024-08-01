@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>位置确认</title>
+</head>
+<body>
+    <h1>位置已确认</h1>
+    <p id="coordinates"></p>
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var lat = urlParams.get('lat');
+        var lng = urlParams.get('lng');
+        document.getElementById('coordinates').innerHTML = '纬度: ' + lat + '<br>经度: ' + lng;
+    </script>
+</body>
+</html>
