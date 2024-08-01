@@ -99,6 +99,10 @@
         
         // 向飞书小程序发送消息
         if (window.tt && window.tt.postMessage) {
+          console.log('Sending message to Lark mini program:', {
+            action: 'confirmLocation',
+            data: currentLocation
+          });
           window.tt.postMessage({
             action: 'confirmLocation',
             data: currentLocation
