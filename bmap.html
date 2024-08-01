@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高德地图</title>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=36ad54204561f8044ed21fb739f5abe4"></script>
+    <style>
+        html, body, #container {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        #info {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+        #confirmButton {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: #1aad19;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="info"></div>
+    <button id="confirmButton" style="display:none;">确认位置</button>
+    <script>
+        var map = new AMap.Map('container', {
+            resizeEnable: true,
+            zoom: 11
+        });
+        var currentLocation = null;
+
+        AMap.plugin('AMap.Geolocation', function() {
+            var geolocation = new AMap.Geolocation({
+                enableHighAccuracy: true,
+                timeout: 10000,
+                buttonPosition: 'RB',
+                buttonOffset: new AMap.Pixel(10, 20),
+                zoomToAccuracy: true
+            });
+
+            map.addControl(geolocation);
+            geolocation.getCurrentPosition();
+        });
+
+        map.on('click', function(e) {
+            currentLocation = e.lnglat;
+            document.getElementById('info').innerHTML = '选中的位置：' + currentLocation.getLng().toFixed(6) + ',' + currentLocation.getLat().toFixed(6);
+            document.getElementById('confirmButton').style.display = 'block';
+        });
+
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (currentLocation) {
+                var lat = currentLocation.getLat().toFixed(6);
+                var lng = currentLocation.getLng().toFixed(6);
+                var message = { lat: lat, lng: lng };
+                window.parent.postMessage(message, '*'); // 发送消息给飞书小程序
+            }
+        });
+
+        // 监听来自飞书小程序的消息
+        window.addEventListener('message', function(event) {
+            console.log('Received message from mini program:', event.data);
+        });
+    </script>
+</body>
+</html>
