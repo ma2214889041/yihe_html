@@ -12,15 +12,50 @@
             margin: 0;
             padding: 0;
         }
+        #overlay {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #coordinates {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        #confirmButton {
+            width: 80%;
+            height: 40px;
+            line-height: 40px;
+            background-color: #07C160;
+            color: white;
+            font-size: 16px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #confirmButton:disabled {
+            background-color: #9ED99D;
+            color: rgba(255, 255, 255, 0.6);
+        }
     </style>
 </head>
 <body>
     <div id="container"></div>
+    <div id="overlay">
+        <div id="coordinates"></div>
+        <button id="confirmButton" disabled>确认位置</button>
+    </div>
     <script>
         var map = new AMap.Map('container', {
             resizeEnable: true,
             zoom: 11
         });
+        var currentLocation = null;
 
         AMap.plugin('AMap.Geolocation', function() {
             var geolocation = new AMap.Geolocation({
@@ -43,7 +78,7 @@
 
         function onComplete(data) {
             console.log('定位成功', data);
-            sendLocationToMiniProgram(data.position.getLng(), data.position.getLat());
+            updateLocation(data.position.getLng(), data.position.getLat());
         }
 
         function onError(data) {
@@ -53,17 +88,26 @@
         // 添加点击事件监听器
         map.on('click', function(e) {
             console.log('地图点击', e);
-            sendLocationToMiniProgram(e.lnglat.getLng(), e.lnglat.getLat());
+            updateLocation(e.lnglat.getLng(), e.lnglat.getLat());
         });
 
-        function sendLocationToMiniProgram(longitude, latitude) {
-            if (window.tt && window.tt.postMessage) {
+        function updateLocation(longitude, latitude) {
+            currentLocation = { longitude, latitude };
+            document.getElementById('coordinates').innerHTML = `
+                <p>经度: ${longitude.toFixed(6)}</p>
+                <p>纬度: ${latitude.toFixed(6)}</p>
+            `;
+            document.getElementById('confirmButton').disabled = false;
+        }
+
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            if (currentLocation && window.tt && window.tt.postMessage) {
                 window.tt.postMessage({
-                    latitude: latitude,
-                    longitude: longitude
+                    action: 'confirmLocation',
+                    data: currentLocation
                 });
             }
-        }
+        });
     </script>
 </body>
 </html>
