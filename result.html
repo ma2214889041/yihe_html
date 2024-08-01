@@ -4,15 +4,33 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>位置确认</title>
+    <style>
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>位置已确认</h1>
     <p id="coordinates"></p>
+    <div id="message" style="display: none;"></div>
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var lat = urlParams.get('lat');
         var lng = urlParams.get('lng');
         document.getElementById('coordinates').innerHTML = '纬度: ' + lat + '<br>经度: ' + lng;
+
+        // 监听来自小程序的消息
+        tt.onMessage(function(res) {
+            console.log('收到小程序消息:', res);
+            if (res.data && res.data.action === 'locationReceived') {
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('message').innerHTML = res.data.message;
+            }
+        });
     </script>
 </body>
 </html>
