@@ -43,12 +43,7 @@
 
         function onComplete(data) {
             console.log('定位成功', data);
-            if (window.tt && window.tt.postMessage) {
-                window.tt.postMessage({
-                    latitude: data.position.lat,
-                    longitude: data.position.lng
-                });
-            }
+            sendLocationToMiniProgram(data.position.getLng(), data.position.getLat());
         }
 
         function onError(data) {
@@ -58,13 +53,17 @@
         // 添加点击事件监听器
         map.on('click', function(e) {
             console.log('地图点击', e);
+            sendLocationToMiniProgram(e.lnglat.getLng(), e.lnglat.getLat());
+        });
+
+        function sendLocationToMiniProgram(longitude, latitude) {
             if (window.tt && window.tt.postMessage) {
                 window.tt.postMessage({
-                    latitude: e.lnglat.getLat(),
-                    longitude: e.lnglat.getLng()
+                    latitude: latitude,
+                    longitude: longitude
                 });
             }
-        });
+        }
     </script>
 </body>
 </html>
