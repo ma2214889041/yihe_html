@@ -96,28 +96,18 @@
       if (currentLocation) {
         this.textContent = '确认中...';
         this.disabled = true;
-        fetch('https://play.svix.com/in/e_fV75v65uaQ4MxeOtPf2k1EQ9y9d/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(currentLocation)
-        })
-        .then(response => {
-          if (response.status === 204) {
-            this.textContent = '确认成功';
-            // 跳转到GPS定位点
-            map.setCenter([currentLocation.longitude, currentLocation.latitude]);
-            map.setZoom(18);  // 设置更高的缩放级别以更好地显示位置
-          } else {
-            throw new Error('网络响应不正常');
-          }
-        })
-        .catch((error) => {
-          console.error('网络请求失败:', error);
-          this.textContent = '确认失败，请重试';
+        
+        // 向飞书小程序发送消息
+        if (window.tt && window.tt.postMessage) {
+          window.tt.postMessage({
+            action: 'confirmLocation',
+            data: currentLocation
+          });
+        } else {
+          console.error('无法与飞书小程序通信');
+          this.textContent = '确认失败';
           this.disabled = false;
-        });
+        }
       }
     });
   </script>
