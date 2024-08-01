@@ -70,6 +70,7 @@
                 var lat = currentLocation.getLat().toFixed(6);
                 var lng = currentLocation.getLng().toFixed(6);
                 var message = { lat: lat, lng: lng };
+                console.log('Sending message:', message);  // Log message before sending
                 window.parent.postMessage(message, '*'); // 发送消息给飞书小程序
             }
         });
@@ -81,4 +82,3 @@
     </script>
 </body>
 </html>
-
